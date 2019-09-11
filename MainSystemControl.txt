@@ -18,7 +18,7 @@ alias currentPressure r10
 alias ticks r11
 waitActive:
 move ticks 0
-move maxTemp 2000
+move maxTemp 2000 #default pressure values that work for most ores/alloys
 move maxPressure 10000
 move minTemp 1000
 move minPressure 1000
@@ -28,26 +28,26 @@ s furnace Lock 1
 l isActive activate Setting
 l type typeDial Setting
 l quantity QuantityDial Setting
-beq isActive 1 selectOres
+beq isActive 1 selectOres #Start selecting ores if the activate button is pressed
 yield
 j waitActive
 selectOres:
-mul expectedReagents 100 quantity
-beq type 0 waitActive
+mul expectedReagents 100 quantity #Most alloys run in increments of 100
+beq type 0 waitActive #reset if a valid selection wasn't made
 beq quantity 0 waitActive
 s furnace Open 0
-beq type 8 constantan
+beq type 8 constantan #choose an alloy or proceed as a normal ore
 beq type 13 electrum
 beq type 14 invar
 beq type 15 solder
 beq type 16 steel
 standardIngot: 
-mul expectedReagents 50 quantity
+mul expectedReagents 50 quantity #Regular ores run in increments of 50
 push type
 push quantity
 j startOre
-steel:
-mul expectedReagents 200 quantity
+steel: #All alloy selections push the appropriate combinations of ores onto the stack
+mul expectedReagents 200 quantity #Steel runs in increments of 200
 push 8
 push quantity
 mul quantity 3 quantity
@@ -85,23 +85,23 @@ push 3
 push quantity
 j startOre
 startOre:
-beq sp 0 heat
-pop quantity
+beq sp 0 heat #When the stack is empty, start heating
+pop quantity #Pop the current ore off the stack
 pop type
-s typeTemp Setting type
+s typeTemp Setting type #Push the ore type and quantity to the memory for the ore controls
 s quantityPressure Setting quantity
 waitOre:
 l quantity quantityPressure Setting
 l type typeTemp Setting 
-beq quantity 0 startOre
-beq type -1 fail
+beq quantity 0 startOre #Once the quantity has hit 0, move on to the next ore
+beq type -1 fail #If something goes wrong, type memory is set to -1 to denote a failure
 yield
 j waitOre
 heat:
-s furnace Lock 0
-s typeTemp Setting maxTemp
+s furnace Lock 0 #Unlock the furnace (and associated chute) so ore can enter the furnace. 
+s typeTemp Setting maxTemp #Put the temp and pressure max values into the memory units so the furnace heat control can start
 s quantityPressure Setting maxPressure
-waitSmelt:
+waitSmelt: #Wait while the reagents smelt. Keep checking the temp and pressure are within bounds
 yield
 l currentTemp furnace Temperature
 l currentPressure furnace Pressure
@@ -110,19 +110,19 @@ blt currentPressure minPressure waitSmelt
 bgt currentTemp maxTemp waitSmelt
 bgt currentPressure maxPressure waitSmelt
 l reagents furnace Reagents
-beq reagents expectedReagents empty
-bgt ticks expectedReagents empty
+beq reagents expectedReagents empty #If evertyhing is within bounds, check the reagent count on the furnace. If it is what we expect, everything has been processed
+bgt ticks expectedReagents empty #If we're melting ices, they don't display as reagents. Ticks provide a max time to wait before emptying the furnace
 add ticks 3 ticks
 j waitSmelt
 fail:
 yield
 l currentTemp furnace Temperature
-bgt currentTemp 300 fail
+bgt currentTemp 300 fail #If we've failed, make sure the furnace is < 300K so that nothing that enters will get smelted
 empty:
-s furnace Lock 0
-s furnace Open 1
-sleep 10
-l reagents furnace Reagents
+s furnace Lock 0 
+s furnace Open 1 #Open up the furnace to let out contents
+sleep 10 #Sleep allows queued ores to pass through in the event of a failure
+l reagents furnace Reagents #Ensures the furnace is empty before resetting
 beq reagents 0 waitActive
 yield
 j empty
