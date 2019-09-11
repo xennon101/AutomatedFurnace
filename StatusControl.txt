@@ -1,5 +1,3 @@
-https://stationeering.com/tools/ic/_KDXfi1WCkF
-
 alias light d0 
 alias typeTemp d1 
 alias quantityPressure d2

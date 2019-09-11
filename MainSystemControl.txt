@@ -1,5 +1,3 @@
-https://stationeering.com/tools/ic/_KDWrf9D9uy
-
 alias activate d0
 alias typeTemp d1
 alias quantityPressure d2

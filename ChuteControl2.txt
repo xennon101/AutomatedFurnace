@@ -1,5 +1,3 @@
-https://stationeering.com/tools/ic/_JeQ79S7mZH
-
 alias type d0
 alias quantity d1
 alias chute1 d2

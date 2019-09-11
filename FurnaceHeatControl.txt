@@ -1,5 +1,3 @@
-https://stationeering.com/tools/ic/_KDoPWbKCyu
-
 alias furnace d0
 alias tempMem d1
 alias pressureMem d2
