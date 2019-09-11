@@ -1,0 +1,72 @@
+https://stationeering.com/tools/ic/_JeQ79S7mZH
+
+https://stationeering.com/tools/ic/_JeQ79S7mZH
+
+alias type d0
+alias quantity d1
+alias chute1 d2
+alias chute2 d3
+alias chute3 d4
+alias chute4 d5
+
+alias slotOccupied r0
+alias typeStore r1
+alias quantityStore r2
+
+s chute1 Lock 1
+s chute2 Lock 1
+s chute3 Lock 1
+s chute4 Lock 1
+
+waitActive:
+yield
+l typeStore type Setting
+
+beq typeStore 1 startOre1
+beq typeStore 2 startOre2
+beq typeStore 3 startOre3
+beq typeStore 4 startOre4
+
+j waitActive
+
+startOre1:
+alias currentChute d2
+j startOre
+startOre2:
+alias currentChute d3
+j startOre
+startOre3:
+alias currentChute d4
+j startOre
+startOre4:
+alias currentChute d5
+
+startOre:
+l quantityStore quantity Setting
+
+beq quantityStore 0 waitActive
+
+loopOre:
+
+ls slotOccupied currentChute 0 Occupied
+
+beq slotOccupied 0 fail
+s currentChute Open 1
+s currentChute Open 0
+s currentChute Lock 1
+
+sub quantityStore quantityStore 1
+
+s quantity Setting quantityStore
+
+sleep 1
+beq quantityStore 0 waitActive
+
+yield
+
+j loopOre
+
+fail:
+s type Setting -1
+
+j waitActive
