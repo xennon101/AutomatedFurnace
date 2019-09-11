@@ -12,10 +12,10 @@ alias multiplier r4
 
 start:
 l currentTypeTemp typeTemp Setting
-beq currentTypeTemp -1 red
-beq currentTypeTemp 0 green
+beq currentTypeTemp -1 red  #-1 means a failure.
+beq currentTypeTemp 0 green #0 means we're reset and good to go
 
-yellow:
+yellow: #yellow if anything else
 s light Color 5
 j quantityDisplay
 
@@ -32,6 +32,7 @@ l quantity quantityDial Setting
 
 move multiplier 50
 
+#decide if we're working with a 1:1 alloy, Steel or a standard ore
 beq type 8 alloy
 beq type 13 alloy
 beq type 14 alloy
@@ -50,7 +51,7 @@ move multiplier 200
 multiply:
 mul totalQuantity quantity multiplier
 
-brgt type 0 2
+brgt type 0 2 #If no type is selected, display 0
 move totalQuantity 0
 
 s quantityDisplay Setting totalQuantity
